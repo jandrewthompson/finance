@@ -1,0 +1,19 @@
+<div>
+    <h3>Categories</h3>
+    <ul ng-repeat="c in categories | orderBy:'level'">
+        <li>{{c.levelPad}} {{c.category_name}} </li>
+    </ul>
+more cats
+    <ul ng-repeat="c in topCategory.children">
+        <li>{{c.category_name}}</li>
+        <ul ng-repeat="c2 in c.children">
+            <li ng-click="doit(c2)" >{{c2.category_name}}</li>
+            <ul ng-repeat="c3 in c2.children">
+                <li>{{c3.category_name}}</li>
+                <ul ng-repeat="c4 in c3.children">
+                    <li>{{c4.category_name}}</li>
+                </ul>
+            </ul>
+        </ul>
+    </ul>
+###

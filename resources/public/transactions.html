@@ -1,0 +1,66 @@
+<div>
+    <h3>{{account.account_name}}</h3>
+    <table class="table table-bordered table-striped table-condensed table-hover" >
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Num</th>
+                <th>Payee</th>
+                <th>Memo</th>
+                <th>Category</th>
+                <th>Amount</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tr ng-repeat="tx in account.transactions">
+            <td class="span2">{{tx.transaction_date | date:'shortDate'}}</td>
+            <td class="span1">{{tx.check_number}}</td>
+            <td class="span4">{{tx.payee}}</td>
+            <td class="span2">{{tx.memo}}</td>
+            <td class="span4">{{tx.category_name}}</td>
+            <td class="span2">{{tx.amount}}</td>
+            <td class="span2">
+                <a href="#editModal" role="button" class="btn btn-small btn-info" data-toggle="modal" data-backdrop="static" data-keyboard="false" ng-click="editTransaction(tx)">edit</a></td>
+            <td>
+                <button class="btn btn-small btn-warning" data-toggle="modal" data-target="#confirmModal_{{$index}}"  >delete</button>
+                <div id="confirmModal_{{$index}}" role="dialog" class="modal hide fade">
+                    <div class="modal-body">
+                        <h3>Are you sure you want to delete this transaction?</h3>
+                        <button class="btn btn-small btn-warning"  ng-click="deleteTransaction(tx,$index)">Yes</button>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
+    <a href="#editModal" role="button" class="btn btn-info" data-toggle="modal" data-backdrop="static" data-keyboard="false"
+            ng-click="editTransaction()">Add Transaction...</a>
+</div>
+
+<div id="editModal" role="dialog" class="modal hide fade" style="display: none;">
+    <form name="txForm"  ng-submit="saveTransaction(tx)" >
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3>Edit Transaction</h3> 
+        </div>
+        <div class="modal-body">
+            <label for="txDate">TX Date: </label> 
+            <input name="txDate" type="input" ng-model="tx.transaction_date" ui-date="{ dateFormat: 'yy-mm-dd'}"  required />
+            <label for="checkNum">Check #: </label> 
+            <input name="checkNum" type="input" ng-model="tx.check_number" />
+            <label for="payee">Payee: </label> 
+            <input name="payee" type="input" ng-model="tx.payee" required />
+            <label for="memo">Memo: </label> 
+            <input name="memo" type="input" ng-model="tx.memo" required />
+            <label for="category">Category: </label> 
+            <select name="category" ng-options="c.category_id as c.category_name  for c in categories"  ng-model="selected_category" ng-change="categoryChange()" required >
+                <option>--</option>
+            </select>
+            <label for="amount">Amount: </label> 
+            <input name="amount" type="input" ng-model="tx.amount"  required/>
+        </div>
+        <div class="modal-footer"> 
+            <button class="btn" data-dismiss="modal" aria-hidden="true" ng-click="cancelTransaction()">Close</button>
+            <input type="submit" class="btn btn-primary" value="Save changes"/>
+        </div>
+    </form>
+</div>
