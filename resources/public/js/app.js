@@ -170,11 +170,11 @@ angular.module('appservices', ['ngResource']).
     directive('droppable', function($rootScope,Categories) {
         return {
             restrict:'A',
-            link: function($scope, element, attrs) {
+            link: function(scope, element, attrs) {
                 element.droppable({
                     accept: "li",
                     hoverClass: "drop-hover",
-                    drop:function(event,ui,$scope) {
+                    drop:function(event,ui) {
                         alert("DROPPED: " 
                                 + $rootScope.sourceCat.category_name 
                                 + " to: " 
