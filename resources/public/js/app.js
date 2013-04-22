@@ -31,8 +31,7 @@ function AccountCtrl($scope, $rootScope, $route, $routeParams, Accounts, Categor
                 'amount':''};
             $scope.account.transactions.push(tx);
         } else {
-            //$scope.selected_category = {'category_id':tx.category_id,
-                $scope.selected_category = tx.category_id;
+            $scope.selected_category = tx.category_id;
             tx.transaction_date = new Date(tx.transaction_date);
         }
         $scope.originalTx = angular.copy(tx);
@@ -67,75 +66,27 @@ function AccountCtrl($scope, $rootScope, $route, $routeParams, Accounts, Categor
 };
 function TransactionCtrl($scope, $rootScope, $route, $routeParams )
 {
-	$rootScope.activeTab = $route.current.activeTab;
-	$scope.accounts = [{'id':100,
-                        'name':'Andrews Checking',
-                        'transactions':[
-                            {'id':1,
-                                'amount':10.00,
-                                'payee':'Walmart',
-                                'category':'Groceries',
-                                'date':'03-29-2013',
-                                'checknum':101},
-                            {'id':2,
-                                'amount':20.00,
-                                'payee':'Joes',
-                                'category':'Groceries',
-                                'date':'03-29-2013',
-                                'checknum':102}
-        ]}];
-
-
-    $scope.account = $scope.accounts[0];
 };
 
-function BudgetCtrl($scope, $rootScope, $route, $routeParams, Categories )
+function BudgetCtrl($scope, $rootScope, $route, $routeParams, Categories, SomeService )
 {
-    $scope.categories_test = [
-        {'id':0, 'name':'A'},
-        {'id':1, 'name':'B', 'pid':0},
-        {'id':2, 'name':'C', 'pid':0},
-        {'id':3, 'name':'D', 'pid':1},
-        {'id':4, 'name':'E', 'pid':1},
-        {'id':5, 'name':'F', 'pid':3},
-        {'id':6, 'name':'G', 'pid':0},
-        {'id':7, 'name':'H', 'pid':0},
-        {'id':8, 'name':'I', 'pid':0},
-        {'id':9, 'name':'J', 'pid':0}];
- 
-    $scope.doit = function(cat)
-    {
-        cat.category_parent = 1;
-        alert(cat.category_parent);
-        $scope.topCategory = $scope.makeTree($scope.topCategory, {},0);
-    };
-    $scope.mytree = [
-        { 
-            name: 'item1',
-            children: [
-                {name:'child1'}
-                ]}
-        ];
     $scope.init = function()
     {
         Categories.get( function(data){
             $scope.categories = data.categories;
-            $scope.topCategory = $scope.makeTree($scope.categories, {}, 0);
+            $scope.topCategory = $scope.makeTree($scope.categories, {});
         });
     };
-    $scope.init();
 
-    $scope.makeTree = function(coll, par, lvl)
+    $scope.makeTree = function(coll, par)
     {
         angular.forEach(coll, function(child,key) {
             if(child.category_parent == par.category_id)
             {
-                $scope.makeTree(coll, child,++lvl);
+                $scope.makeTree(coll, child);
                 if(!par.children)
                     par.children = [];
                 par.children.push(child);
-                child.level=lvl;
-                child.levelPad=new Array(lvl).join(" -- ");
             }
         });
 
@@ -146,6 +97,8 @@ function BudgetCtrl($scope, $rootScope, $route, $routeParams, Categories )
     {
         alert('do foo');
     };
+    
+    $scope.init();
 };
    
 
@@ -176,26 +129,57 @@ angular.module('appservices', ['ngResource']).
 		var Categories = $resource('/categories/:id');
 		return Categories; 
     }).
-    directive('draggable', function() {
+    factory('SomeService', function() {
+        var SomeService = {
+            getWelcome: function() {
+                return "Im a service";
+            }
+        };
+            
+        return SomeService;
+    }).
+    directive('category',function(Categories) {
+        return {
+            restrict:'E',
+            template: "<li draggable droppable>{{cat.category_name}}</li>",
+            scope: {
+                cat: "=cat"
+            }, 
+            link: function(scope, element, attrs) {
+                
+                element.bind('click',function(evt) {
+                    alert("ID: " + scope.cat.category_id);
+                });
+            }
+        }
+
+    }).
+    directive('draggable', function($rootScope) {
         return {
             restrict:'A',
             link: function(scope, element, attrs) {
                 element.draggable({
-                    revert:true
+                        revert:true,
+                        start:function(event,ui){
+                            $rootScope.sourceCat = scope.cat;
+                        }   
                 });
             }
         };
     }).
-    directive('droppable', function() {
+    directive('droppable', function($rootScope,Categories) {
         return {
             restrict:'A',
-            link: function(scope, element, attrs) {
+            link: function($scope, element, attrs) {
                 element.droppable({
-                    accept: ".category",
+                    accept: "li",
                     hoverClass: "drop-hover",
                     drop:function(event,ui,$scope) {
-                        alert(scope.c.category_name);
-                        scope.$parent.init();
+                        alert("DROPPED: " 
+                                + $rootScope.sourceCat.category_name 
+                                + " to: " 
+                                + scope.cat.category_name);
+                        
                     }
                 });
             }
