@@ -12,8 +12,7 @@
 
 (defn home-page []
   (layout/render
-    "home.html" {:content (util/md->html "/md/docs.md")}))
-
+    "home.html" {:content (util/md->html "/md/docs.md")})) 
 (defn about-page []
   (layout/render "about.html"))
 
@@ -38,6 +37,10 @@
            (DELETE "/accounts/:id" [id] 
                  (core/delete-tx! {:transaction_id id} 
                                   ))
-           (GET "/categories" [] (json-response {:categories  (core/fetch-categories)}))
-           (GET "/about" [] (about-page)))
+           (GET  "/categories" [] (json-response {:categories  (core/fetch-categories)}))
+           (POST "/categories" request 
+                 (core/insert-or-update-cat! 
+                   (json/parse-string 
+                     (slurp (:body request)) true)))
+           (GET  "/about" [] (about-page)))
 

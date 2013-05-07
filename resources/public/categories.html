@@ -1,15 +1,17 @@
-<div>
+<div id="cagetories">
     <h3>Categories</h3>
     <ul ng-repeat="c in topCategory.children">
-        <category cat="c"/>
+        <category ondrop="init" cat="c"/>
         <ul ng-repeat="c2 in c.children">
-            <category cat="c2"/>
+            <category ondrop="init" cat="c2"/>
             <ul ng-repeat="c3 in c2.children">
-            <category cat="c3"/>
+                <category ondrop="init" cat="c3"/>
                 <ul ng-repeat="c4 in c3.children">
-                    <category cat="c4"/>
+                    <category ondrop="init" cat="c4"/>
+                    <ul ng-repeat="c5 in c4.children">
+                        <category ondrop="init" cat="c5"/>
+                    </ul>
                 </ul>
             </ul>
         </ul>
     </ul>
-###

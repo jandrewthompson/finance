@@ -92,6 +92,36 @@
                            (map (fn [ans] (assoc ans :response_id response-key)))) ]
         (apply sql/insert-records :response_detail rows)))))
 
+(defn insert-cat!
+  ""
+  [cat]
+  {:pre [(map? cat)]}  ; this precondition compiles into a java assertion
+  (sql/with-connection 
+    util/db
+    (sql/transaction
+        (sql/insert-record :category
+                                            (select-keys cat [:category_id
+                                                             :category_name 
+                                                             :category_parent
+                                                            ])) 
+      )))
+
+(defn update-cat!
+  ""
+  [cat]
+  {:pre [(map? cat)]}  ; this precondition compiles into a java assertion
+  (sql/with-connection 
+    util/db
+    (sql/transaction
+        (sql/update-values :category
+                           ["category_id=?" (:category_id cat)]
+                                            (select-keys cat [:category_id
+                                                              :category_name 
+                                                              :category_parent
+                                                              ]))
+      )))
+
+
 (defn update-tx!
   ""
   [tx]
@@ -144,6 +174,13 @@
   )
 
  
+(defmulti insert-or-update-cat! (fn [x]  (nil? (:category_id x ))))
+(defmethod insert-or-update-cat! true [cat]
+  (insert-cat! cat)
+  )
+(defmethod insert-or-update-cat!  false [cat]
+  (update-cat! cat)
+  )
 
 (def qif-rec "D1/3/00
              PTogo's

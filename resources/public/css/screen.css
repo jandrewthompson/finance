@@ -5,6 +5,18 @@ body {
     font-size: 13px;
 }
 
+.ui-draggable {
+
+    border: 1px solid #A9A9BB;
+    background-color: #ececec;
+    margin: 3px;
+    padding: 3px;
+}
+
+li  {
+    list-style: none;
+}
+
 #register {
     float: left;
     display: inline-block;
